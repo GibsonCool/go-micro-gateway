@@ -47,6 +47,14 @@ func (r *RealServer) Run() {
 
 func (r *RealServer) HelloHandler(writer http.ResponseWriter, request *http.Request) {
 	// 返回访问地址路径
-	upath := fmt.Sprintf("http://%s%s\n", r.Addr, request.URL.Path)
-	io.WriteString(writer, upath)
+	uPath := fmt.Sprintf("http://%s%s\n", r.Addr, request.URL.Path)
+	realIp := fmt.Sprintf("RemoteAddr=%s,X-Forwarded-For=%v,X-Real-Ip=%v\n",
+		request.RemoteAddr,
+		request.Header.Get("X-Forwarded-For"),
+		request.Header.Get("X-Real-Ip"))
+	header := fmt.Sprintf("headers=%v\n", request.Header)
+	io.WriteString(writer, uPath)
+	io.WriteString(writer, realIp)
+	io.WriteString(writer, header)
+
 }
