@@ -4,10 +4,10 @@ package load_balance
 type LbType int
 
 const (
-	LbRandom LbType = iota
-	LbRoundRobin
-	LbWeightRoundRobin
-	LbConsistentHash
+	LbRandom           LbType = iota // 随机
+	LbRoundRobin                     // 轮询
+	LbWeightRoundRobin               // 权重轮询
+	LbConsistentHash                 // 一致性hash
 )
 
 func LoadBalanceFactory(lbType LbType) LoadBalance {
