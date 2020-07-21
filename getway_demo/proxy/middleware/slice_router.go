@@ -95,6 +95,7 @@ func newSliceRouterContext(rw http.ResponseWriter, req *http.Request, r *SliceRo
 			// 寻找最长符合前缀的，比如 uri: /test/11/22   path1:/test  path2:/test/11 使用 path2
 			pathLen := len(group.path)
 			if pathLen > matchUrlLen {
+				matchUrlLen = pathLen
 				*newSliceGroup = *group
 			}
 		}
