@@ -104,8 +104,6 @@ func newSliceRouterContext(rw http.ResponseWriter, req *http.Request, r *SliceRo
 	c := &SliceRouterContext{Rw: rw, Req: req, Ctx: req.Context(), SliceGroup: newSliceGroup}
 	c.Reset()
 	return c
-
-	return &SliceRouterContext{Rw: rw, Req: req}
 }
 
 type HandlerFunc func(*SliceRouterContext)
