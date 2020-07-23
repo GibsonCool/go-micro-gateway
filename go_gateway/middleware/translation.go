@@ -45,16 +45,16 @@ func TranslationMiddleware() gin.HandlerFunc {
 
 			//自定义验证方法
 			//https://github.com/go-playground/validator/blob/v9/_examples/custom-validation/main.go
-			val.RegisterValidation("is-validuser", func(fl validator.FieldLevel) bool {
+			val.RegisterValidation("valid_username", func(fl validator.FieldLevel) bool {
 				return fl.Field().String() == "admin"
 			})
 
 			//自定义验证器
 			//https://github.com/go-playground/validator/blob/v9/_examples/translations/main.go
-			val.RegisterTranslation("is-validuser", trans, func(ut ut.Translator) error {
-				return ut.Add("is-validuser", "{0} 填写不正确哦", true)
+			val.RegisterTranslation("valid_username", trans, func(ut ut.Translator) error {
+				return ut.Add("valid_username", "{0} 填写不正确哦 {1}", true)
 			}, func(ut ut.Translator, fe validator.FieldError) string {
-				t, _ := ut.T("is-validuser", fe.Field())
+				t, _ := ut.T("valid_username", fe.Field(), fe.Param())
 				return t
 			})
 			break
