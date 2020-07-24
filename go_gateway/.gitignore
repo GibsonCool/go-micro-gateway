@@ -7,4 +7,5 @@
 *.iml
 out
 gen
-logs/
+!/logs/
+!/docs/

@@ -15,7 +15,7 @@ import (
 func AdminLoginRegister(group *gin.RouterGroup) {
 	adminLogin := &AdminLoginController{}
 	group.POST("/login", adminLogin.AdminLogin)
-	group.POST("/logout", adminLogin.AdminLogOut)
+	group.GET("/login_out", adminLogin.AdminLogOut)
 }
 
 type AdminLoginController struct {
@@ -67,6 +67,16 @@ func (c *AdminLoginController) AdminLogin(ctx *gin.Context) {
 	middleware.ResponseSuccess(ctx, out)
 }
 
-func (c *AdminLoginController) AdminLogOut(context *gin.Context) {
-
+// @Summary 管理员退出
+// @Description 管理员退出
+// @Tags 管理员接口
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} middleware.Response{data=string} "success"
+// @Router /admin_login/login_out [get]
+func (c *AdminLoginController) AdminLogOut(ctx *gin.Context) {
+	session := sessions.Default(ctx)
+	session.Delete(public.AdminSessionInfoKey)
+	session.Save()
+	middleware.ResponseSuccess(ctx, "退出成功")
 }
