@@ -3,6 +3,7 @@ package dto
 import (
 	"github.com/gin-gonic/gin"
 	"go-micro-gateway/go_gateway/public"
+	"time"
 )
 
 /*
@@ -21,4 +22,10 @@ func (param *AdminLoginInput) BindValidParam(c *gin.Context) error {
 
 type AdminLoginOutput struct {
 	Token string `json:"token" form:"token" comment:"管理员token" example:"admin_tests" validate:""` // token
+}
+
+type AdminSessionInfo struct {
+	ID        int       `json:"id"`
+	UserName  string    `json:"user_name"`
+	LoginTime time.Time `json:"login_time"`
 }

@@ -39,8 +39,6 @@ info:
 paths:
   /admin_login/login:
     post:
-      consumes:
-      - application/json
       description: 管理员登录
       parameters:
       - description: body

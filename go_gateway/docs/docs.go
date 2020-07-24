@@ -28,9 +28,6 @@ var doc = `{
         "/admin_login/login": {
             "post": {
                 "description": "管理员登录",
-                "consumes": [
-                    "application/json"
-                ],
                 "produces": [
                     "application/json"
                 ],
