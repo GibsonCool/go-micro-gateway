@@ -12,6 +12,12 @@ import (
 	"time"
 )
 
+func AdminLoginRegister(group *gin.RouterGroup) {
+	adminLogin := &AdminLoginController{}
+	group.POST("/login", adminLogin.AdminLogin)
+	group.POST("/logout", adminLogin.AdminLogOut)
+}
+
 type AdminLoginController struct {
 }
 
@@ -63,10 +69,4 @@ func (c *AdminLoginController) AdminLogin(ctx *gin.Context) {
 
 func (c *AdminLoginController) AdminLogOut(context *gin.Context) {
 
-}
-
-func AdminLoginRegister(group *gin.RouterGroup) {
-	adminLogin := &AdminLoginController{}
-	group.POST("/login", adminLogin.AdminLogin)
-	group.POST("/logout", adminLogin.AdminLogOut)
 }
