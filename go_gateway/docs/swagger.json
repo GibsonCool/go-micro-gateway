@@ -1,0 +1,261 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "contact": {},
+        "license": {}
+    },
+    "paths": {
+        "/admin/admin_info": {
+            "get": {
+                "description": "获取管理员信息",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "管理员接口"
+                ],
+                "summary": "获取管理员信息",
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/middleware.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/dto.AdminInfoOutput"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/change_pwd": {
+            "post": {
+                "description": "改变密码",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "管理员接口"
+                ],
+                "summary": "改变密码",
+                "parameters": [
+                    {
+                        "description": "body",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.ChangePwdInput"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/middleware.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/admin_login/login": {
+            "post": {
+                "description": "管理员登录",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "管理员接口"
+                ],
+                "summary": "管理员登录",
+                "parameters": [
+                    {
+                        "description": "body",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.AdminLoginInput"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/middleware.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/dto.AdminLoginOutput"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/admin_login/login_out": {
+            "get": {
+                "description": "管理员退出",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "管理员接口"
+                ],
+                "summary": "管理员退出",
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/middleware.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "dto.AdminInfoOutput": {
+            "type": "object",
+            "properties": {
+                "avatar": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "introduction": {
+                    "type": "string"
+                },
+                "login_time": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "roles": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "dto.AdminLoginInput": {
+            "type": "object",
+            "required": [
+                "password",
+                "username"
+            ],
+            "properties": {
+                "password": {
+                    "description": "密码",
+                    "type": "string",
+                    "example": "123456"
+                },
+                "username": {
+                    "description": "管理员用户名",
+                    "type": "string",
+                    "example": "admin"
+                }
+            }
+        },
+        "dto.AdminLoginOutput": {
+            "type": "object",
+            "properties": {
+                "token": {
+                    "description": "token",
+                    "type": "string",
+                    "example": "admin_tests"
+                }
+            }
+        },
+        "dto.ChangePwdInput": {
+            "type": "object",
+            "required": [
+                "password"
+            ],
+            "properties": {
+                "password": {
+                    "description": "修改密码",
+                    "type": "string",
+                    "example": "123123"
+                }
+            }
+        },
+        "middleware.Response": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "object"
+                },
+                "errmsg": {
+                    "type": "string"
+                },
+                "errno": {
+                    "type": "integer"
+                },
+                "stack": {
+                    "type": "object"
+                },
+                "trace_id": {
+                    "type": "object"
+                }
+            }
+        }
+    }
+}
