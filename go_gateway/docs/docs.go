@@ -61,7 +61,7 @@ var doc = `{
             }
         },
         "/admin/change_pwd": {
-            "get": {
+            "post": {
                 "description": "改变密码",
                 "consumes": [
                     "application/json"
@@ -80,7 +80,7 @@ var doc = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.AdminLoginInput"
+                            "$ref": "#/definitions/dto.ChangePwdInput"
                         }
                     }
                 ],
@@ -96,7 +96,7 @@ var doc = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/dto.AdminLoginOutput"
+                                            "type": "string"
                                         }
                                     }
                                 }
@@ -241,6 +241,19 @@ var doc = `{
                     "description": "token",
                     "type": "string",
                     "example": "admin_tests"
+                }
+            }
+        },
+        "dto.ChangePwdInput": {
+            "type": "object",
+            "required": [
+                "password"
+            ],
+            "properties": {
+                "password": {
+                    "description": "修改密码",
+                    "type": "string",
+                    "example": "123123"
                 }
             }
         },

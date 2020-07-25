@@ -35,14 +35,14 @@ func (c *AdminLoginController) AdminLogin(ctx *gin.Context) {
 		middleware.ResponseError(ctx, 2000, err)
 		return
 	}
-	gormDb, err := lib.GetGormPool("default")
+	gDB, err := lib.GetGormPool("default")
 	if err != nil {
 		middleware.ResponseError(ctx, 2001, err)
 		return
 	}
 
 	admin := &dao.Admin{}
-	admin, err = admin.LoginCheck(ctx, gormDb, params)
+	admin, err = admin.LoginCheck(ctx, gDB, params)
 	if err != nil {
 		middleware.ResponseError(ctx, 2002, err)
 		return

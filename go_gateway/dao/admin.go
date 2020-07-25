@@ -43,3 +43,7 @@ func (t *Admin) Find(c *gin.Context, db *gorm.DB, search *Admin) (*Admin, error)
 	}
 	return out, nil
 }
+
+func (t *Admin) Save(c *gin.Context, db *gorm.DB) error {
+	return db.SetCtx(public.GetGinTraceContext(c)).Save(t).Error
+}

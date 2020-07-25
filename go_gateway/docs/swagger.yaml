@@ -37,6 +37,15 @@ definitions:
         example: admin_tests
         type: string
     type: object
+  dto.ChangePwdInput:
+    properties:
+      password:
+        description: 修改密码
+        example: "123123"
+        type: string
+    required:
+    - password
+    type: object
   middleware.Response:
     properties:
       data:
@@ -75,7 +84,7 @@ paths:
       tags:
       - 管理员接口
   /admin/change_pwd:
-    get:
+    post:
       consumes:
       - application/json
       description: 改变密码
@@ -85,7 +94,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/dto.AdminLoginInput'
+          $ref: '#/definitions/dto.ChangePwdInput'
       produces:
       - application/json
       responses:
@@ -96,7 +105,7 @@ paths:
             - $ref: '#/definitions/middleware.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/dto.AdminLoginOutput'
+                  type: string
               type: object
       summary: 改变密码
       tags:

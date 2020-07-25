@@ -9,3 +9,5 @@
 out
 gen
 
+!/go_gateway/logs/
+!/go_gateway/docs/
