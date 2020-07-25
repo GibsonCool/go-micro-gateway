@@ -9,6 +9,7 @@
 out
 gen
 
-#/go_gateway/logs/:
-#/go_gateway/docs/:
+/go_gateway/logs/go_tateway.inf.log
+/go_gateway/logs/go_tateway.wf.log
+
 
