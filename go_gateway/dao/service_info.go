@@ -50,7 +50,7 @@ func (t *ServiceInfo) PageList(
 	}
 
 	// 分页
-	query = query.Limit(param.PageSize).Offset(offset)
+	query = query.Limit(param.PageSize).Offset(offset).Order("id desc")
 	query.Count(&total)
 	if err := query.Find(&list).Error; err != nil && err != gorm.ErrRecordNotFound {
 		return nil, 0, err

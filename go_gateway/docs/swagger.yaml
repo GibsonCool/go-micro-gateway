@@ -195,6 +195,30 @@ paths:
       summary: 管理员退出
       tags:
       - 管理员接口
+  /service/service_delete:
+    get:
+      description: 服务删除
+      parameters:
+      - description: 服务ID
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            allOf:
+            - $ref: '#/definitions/middleware.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.ServiceListOutput'
+              type: object
+      summary: 服务删除
+      tags:
+      - 服务管理
   /service/service_list:
     get:
       description: 获取服务列表

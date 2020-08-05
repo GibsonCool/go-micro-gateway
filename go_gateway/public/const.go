@@ -22,6 +22,9 @@ const (
 
 	JwtSignKey = "my_sign_key"
 	JwtExpires = 60 * 60
+
+	UnDelete = 0
+	IsDelete = 1
 )
 
 var (

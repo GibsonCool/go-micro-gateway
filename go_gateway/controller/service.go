@@ -14,6 +14,7 @@ import (
 func ServiceRegister(group *gin.RouterGroup) {
 	service := &ServiceController{}
 	group.GET("/service_list", service.ServiceList)
+	group.GET("/service_delete", service.ServiceDelete)
 }
 
 type ServiceController struct {
@@ -104,4 +105,39 @@ func (c *ServiceController) ServiceList(ctx *gin.Context) {
 		List:  outList,
 	}
 	middleware.ResponseSuccess(ctx, out)
+}
+
+// @Summary 服务删除
+// @Description 服务删除
+// @Tags 服务管理
+// @Produce  json
+// @Param id query string true "服务ID"
+// @Success 200 {object} middleware.Response{data=dto.ServiceListOutput} "success"
+// @Router /service/service_delete [get]
+func (c *ServiceController) ServiceDelete(ctx *gin.Context) {
+	params := &dto.ServiceDelete{}
+	if err := params.BindValidParam(ctx); err != nil {
+		middleware.ResponseError(ctx, 2000, err)
+		return
+	}
+
+	gDB, err := lib.GetGormPool("default")
+	if err != nil {
+		middleware.ResponseError(ctx, 2001, err)
+		return
+	}
+
+	serviceInfo := &dao.ServiceInfo{ID: params.ID}
+	serviceInfo, err = serviceInfo.Find(ctx, gDB, serviceInfo)
+	if err != nil {
+		middleware.ResponseError(ctx, 2002, err)
+		return
+	}
+
+	serviceInfo.IsDelete = public.IsDelete
+	if err := serviceInfo.Save(ctx, gDB); err != nil {
+		middleware.ResponseError(ctx, 2003, err)
+		return
+	}
+	middleware.ResponseSuccess(ctx, "删除成功")
 }
