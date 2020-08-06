@@ -187,6 +187,52 @@ var doc = `{
                 }
             }
         },
+        "/service/service_add_http": {
+            "post": {
+                "description": "添加HTTP服务",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "服务管理"
+                ],
+                "summary": "添加HTTP服务",
+                "parameters": [
+                    {
+                        "description": "body",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.ServiceAddHTTPInput"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/middleware.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
         "/service/service_delete": {
             "get": {
                 "description": "服务删除",
@@ -218,7 +264,7 @@ var doc = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/dto.ServiceListOutput"
+                                            "type": "string"
                                         }
                                     }
                                 }
@@ -349,6 +395,108 @@ var doc = `{
                     "description": "修改密码",
                     "type": "string",
                     "example": "123123"
+                }
+            }
+        },
+        "dto.ServiceAddHTTPInput": {
+            "type": "object",
+            "required": [
+                "ip_list",
+                "rule",
+                "service_desc",
+                "service_name",
+                "weight_list"
+            ],
+            "properties": {
+                "black_list": {
+                    "description": "黑名单ip",
+                    "type": "string"
+                },
+                "clientip_flow_limit": {
+                    "description": "\u0008客户端ip限流",
+                    "type": "integer"
+                },
+                "header_transfor": {
+                    "description": "header转换",
+                    "type": "string"
+                },
+                "ip_list": {
+                    "description": "ip列表",
+                    "type": "string",
+                    "example": "127.0.0.1:9090"
+                },
+                "need_https": {
+                    "description": "支持https",
+                    "type": "integer"
+                },
+                "need_strip_uri": {
+                    "description": "启用strip_uri",
+                    "type": "integer"
+                },
+                "need_websocket": {
+                    "description": "是否支持websocket",
+                    "type": "integer"
+                },
+                "open_auth": {
+                    "description": "关键词",
+                    "type": "integer"
+                },
+                "round_type": {
+                    "description": "轮询方式",
+                    "type": "integer"
+                },
+                "rule": {
+                    "description": "域名或者前缀",
+                    "type": "string",
+                    "example": "/new_test_123"
+                },
+                "rule_type": {
+                    "description": "接入类型",
+                    "type": "integer",
+                    "example": 0
+                },
+                "service_desc": {
+                    "description": "服务描述",
+                    "type": "string",
+                    "example": "test123456"
+                },
+                "service_flow_limit": {
+                    "description": "服务端限流",
+                    "type": "integer"
+                },
+                "service_name": {
+                    "description": "服务名",
+                    "type": "string",
+                    "example": "new_test_123"
+                },
+                "upstream_connect_timeout": {
+                    "description": "建立连接超时, 单位s",
+                    "type": "integer"
+                },
+                "upstream_header_timeout": {
+                    "description": "获取header超时, 单位s",
+                    "type": "integer"
+                },
+                "upstream_idle_timeout": {
+                    "description": "链接最大空闲时间, 单位s",
+                    "type": "integer"
+                },
+                "upstream_max_idle": {
+                    "description": "最大空闲链接数",
+                    "type": "integer"
+                },
+                "url_rewrite": {
+                    "description": "url重写功能",
+                    "type": "string"
+                },
+                "weight_list": {
+                    "description": "\u0008权重列表",
+                    "type": "string",
+                    "example": "20"
+                },
+                "white_list": {
+                    "description": "白名单ip",
+                    "type": "string"
                 }
             }
         },

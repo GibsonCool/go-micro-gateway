@@ -4,17 +4,20 @@ import (
 	"fmt"
 	"github.com/e421083458/golang_common/lib"
 	"github.com/gin-gonic/gin"
+	"github.com/pkg/errors"
 	"go-micro-gateway/go_gateway/dao"
 	"go-micro-gateway/go_gateway/dto"
 	"go-micro-gateway/go_gateway/middleware"
 	"go-micro-gateway/go_gateway/public"
 	"strconv"
+	"strings"
 )
 
 func ServiceRegister(group *gin.RouterGroup) {
 	service := &ServiceController{}
 	group.GET("/service_list", service.ServiceList)
 	group.GET("/service_delete", service.ServiceDelete)
+	group.POST("/service_add_http", service.ServiceAddHTTP)
 }
 
 type ServiceController struct {
@@ -112,7 +115,7 @@ func (c *ServiceController) ServiceList(ctx *gin.Context) {
 // @Tags 服务管理
 // @Produce  json
 // @Param id query string true "服务ID"
-// @Success 200 {object} middleware.Response{data=dto.ServiceListOutput} "success"
+// @Success 200 {object} middleware.Response{data=string} "success"
 // @Router /service/service_delete [get]
 func (c *ServiceController) ServiceDelete(ctx *gin.Context) {
 	params := &dto.ServiceDelete{}
@@ -140,4 +143,104 @@ func (c *ServiceController) ServiceDelete(ctx *gin.Context) {
 		return
 	}
 	middleware.ResponseSuccess(ctx, "删除成功")
+}
+
+// @Summary 添加HTTP服务
+// @Description 添加HTTP服务
+// @Tags 服务管理
+// @Accept  json
+// @Produce  json
+// @Param body body dto.ServiceAddHTTPInput true "body"
+// @Success 200 {object} middleware.Response{data=string} "success"
+// @Router /service/service_add_http [POST]
+func (c *ServiceController) ServiceAddHTTP(ctx *gin.Context) {
+	params := &dto.ServiceAddHTTPInput{}
+	if err := params.BindValidParam(ctx); err != nil {
+		middleware.ResponseError(ctx, 2000, err)
+		return
+	}
+
+	gDB, err := lib.GetGormPool("default")
+	if err != nil {
+		middleware.ResponseError(ctx, 2001, err)
+		return
+	}
+	serviceInfo := &dao.ServiceInfo{ServiceName: params.ServiceName}
+	if _, err = serviceInfo.Find(ctx, gDB, serviceInfo); err == nil {
+		middleware.ResponseError(ctx, 2002, errors.New("服务已经存在"))
+		return
+	}
+
+	httpUrl := &dao.HttpRule{RuleType: params.RuleType, Rule: params.Rule}
+	if httpUrl, err = httpUrl.Find(ctx, gDB, httpUrl); err == nil {
+		middleware.ResponseError(ctx, 2003, errors.New("服务接入前缀或域名已存在"))
+		return
+	}
+
+	if len(strings.Split(params.IpList, ",")) != len(strings.Split(params.WeightList, ",")) {
+		middleware.ResponseError(ctx, 2004, errors.New("IP列表与权重列表数量不一致"))
+		return
+	}
+
+	// 数据插入涉及多张表，开启事物
+	gDB = gDB.Begin()
+	serviceModel := &dao.ServiceInfo{
+		ServiceName: params.ServiceName,
+		ServiceDesc: params.ServiceDesc,
+	}
+	if err = serviceModel.Save(ctx, gDB); err != nil {
+		gDB.Rollback()
+		middleware.ResponseError(ctx, 2005, err)
+		return
+	}
+
+	// serviceModel.ID
+	httpRule := &dao.HttpRule{
+		ServiceID:      serviceModel.ID,
+		RuleType:       params.RuleType,
+		Rule:           params.Rule,
+		NeedHttps:      params.NeedHttps,
+		NeedStripUri:   params.NeedStripUri,
+		NeedWebsocket:  params.NeedWebsocket,
+		UrlRewrite:     params.UrlRewrite,
+		HeaderTransfor: params.HeaderTransfor,
+	}
+	if err := httpRule.Save(ctx, gDB); err != nil {
+		gDB.Rollback()
+		middleware.ResponseError(ctx, 2006, err)
+		return
+	}
+
+	accessControl := &dao.AccessControl{
+		ServiceID:         serviceModel.ID,
+		OpenAuth:          params.OpenAuth,
+		BlackList:         params.BlackList,
+		WhiteList:         params.WhiteList,
+		ClientIPFlowLimit: params.ClientipFlowLimit,
+		ServiceFlowLimit:  params.ServiceFlowLimit,
+	}
+	if err := accessControl.Save(ctx, gDB); err != nil {
+		gDB.Rollback()
+		middleware.ResponseError(ctx, 2007, err)
+		return
+	}
+
+	loadbalance := &dao.LoadBalance{
+		ServiceID:              serviceModel.ID,
+		RoundType:              params.RoundType,
+		IpList:                 params.IpList,
+		WeightList:             params.WeightList,
+		UpstreamConnectTimeout: params.UpstreamConnectTimeout,
+		UpstreamHeaderTimeout:  params.UpstreamHeaderTimeout,
+		UpstreamIdleTimeout:    params.UpstreamIdleTimeout,
+		UpstreamMaxIdle:        params.UpstreamMaxIdle,
+	}
+	if err := loadbalance.Save(ctx, gDB); err != nil {
+		gDB.Rollback()
+		middleware.ResponseError(ctx, 2008, err)
+		return
+	}
+
+	gDB.Commit()
+	middleware.ResponseSuccess(ctx, "添加成功")
 }
