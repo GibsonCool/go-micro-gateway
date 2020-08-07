@@ -18,6 +18,7 @@ func ServiceRegister(group *gin.RouterGroup) {
 	group.GET("/service_list", service.ServiceList)
 	group.GET("/service_delete", service.ServiceDelete)
 	group.POST("/service_add_http", service.ServiceAddHTTP)
+	group.GET("/service_detail", service.ServiceDetail)
 	group.POST("/service_update_http", service.ServiceUpdateHTTP)
 }
 
@@ -335,4 +336,43 @@ func (c *ServiceController) ServiceUpdateHTTP(ctx *gin.Context) {
 
 	gDB.Commit()
 	middleware.ResponseSuccess(ctx, "修改成功")
+}
+
+// @Summary 获取服务详情
+// @Description 获取服务详情
+// @Tags 服务管理
+// @Accept  json
+// @Produce  json
+// @Param id query string true "服务ID"
+// @Success 200 {object} middleware.Response{data=dao.ServiceDetail} "success"
+// @Router /service/service_detail [get]
+func (c *ServiceController) ServiceDetail(ctx *gin.Context) {
+	params := &dto.ServiceDelete{}
+	if err := params.BindValidParam(ctx); err != nil {
+		middleware.ResponseError(ctx, 2000, err)
+		return
+	}
+
+	gDB, err := lib.GetGormPool("default")
+	if err != nil {
+		middleware.ResponseError(ctx, 2001, err)
+		return
+	}
+
+	serviceInfo := &dao.ServiceInfo{ID: params.ID}
+	serviceInfo, err = serviceInfo.Find(ctx, gDB, serviceInfo)
+	if err != nil {
+		gDB.Rollback()
+		middleware.ResponseError(ctx, 2002, errors.New("服务未查询到："+err.Error()))
+		return
+	}
+
+	serviceDetail, err := serviceInfo.ServiceDetail(ctx, gDB, serviceInfo)
+	if err != nil {
+		gDB.Rollback()
+		middleware.ResponseError(ctx, 2003, errors.New("服务详情未查询到："+err.Error()))
+		return
+	}
+
+	middleware.ResponseSuccess(ctx, serviceDetail)
 }

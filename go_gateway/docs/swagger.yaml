@@ -1,4 +1,131 @@
 definitions:
+  dao.AccessControl:
+    properties:
+      black_list:
+        type: string
+      clientip_flow_limit:
+        type: integer
+      id:
+        type: integer
+      open_auth:
+        type: integer
+      service_flow_limit:
+        type: integer
+      service_id:
+        type: integer
+      white_host_name:
+        type: string
+      white_list:
+        type: string
+    type: object
+  dao.GrpcRule:
+    properties:
+      header_transfor:
+        type: string
+      id:
+        type: integer
+      port:
+        type: integer
+      service_id:
+        type: integer
+    type: object
+  dao.HttpRule:
+    properties:
+      header_transfor:
+        type: string
+      id:
+        type: integer
+      need_https:
+        type: integer
+      need_strip_uri:
+        type: integer
+      need_websocket:
+        type: integer
+      rule:
+        type: string
+      rule_type:
+        type: integer
+      service_id:
+        type: integer
+      url_rewrite:
+        type: string
+    type: object
+  dao.LoadBalance:
+    properties:
+      check_interval:
+        type: integer
+      check_method:
+        type: integer
+      check_timeout:
+        type: integer
+      forbid_list:
+        type: string
+      id:
+        type: integer
+      ip_list:
+        type: string
+      round_type:
+        type: integer
+      service_id:
+        type: integer
+      upstream_connect_timeout:
+        type: integer
+      upstream_header_timeout:
+        type: integer
+      upstream_idle_timeout:
+        type: integer
+      upstream_max_idle:
+        type: integer
+      weight_list:
+        type: string
+    type: object
+  dao.ServiceDetail:
+    properties:
+      access_control:
+        $ref: '#/definitions/dao.AccessControl'
+        type: object
+      grpc_rule:
+        $ref: '#/definitions/dao.GrpcRule'
+        type: object
+      http_rule:
+        $ref: '#/definitions/dao.HttpRule'
+        type: object
+      info:
+        $ref: '#/definitions/dao.ServiceInfo'
+        type: object
+      load_balance:
+        $ref: '#/definitions/dao.LoadBalance'
+        type: object
+      tcp_rule:
+        $ref: '#/definitions/dao.TcpRule'
+        type: object
+    type: object
+  dao.ServiceInfo:
+    properties:
+      create_at:
+        type: string
+      id:
+        type: integer
+      is_delete:
+        type: integer
+      load_type:
+        type: integer
+      service_desc:
+        type: string
+      service_name:
+        type: string
+      update_at:
+        type: string
+    type: object
+  dao.TcpRule:
+    properties:
+      id:
+        type: integer
+      port:
+        type: integer
+      service_id:
+        type: integer
+    type: object
   dto.AdminInfoOutput:
     properties:
       avatar:
@@ -408,6 +535,32 @@ paths:
                   type: string
               type: object
       summary: 服务删除
+      tags:
+      - 服务管理
+  /service/service_detail:
+    get:
+      consumes:
+      - application/json
+      description: 获取服务详情
+      parameters:
+      - description: 服务ID
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            allOf:
+            - $ref: '#/definitions/middleware.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dao.ServiceDetail'
+              type: object
+      summary: 获取服务详情
       tags:
       - 服务管理
   /service/service_list:

@@ -9,7 +9,7 @@
 out
 gen
 
-/go_gateway/logs/go_tateway.inf.*
+/go_gateway/logs/go_tateway.*
 
 
 

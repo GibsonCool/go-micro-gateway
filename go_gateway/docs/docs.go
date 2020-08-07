@@ -274,6 +274,50 @@ var doc = `{
                 }
             }
         },
+        "/service/service_detail": {
+            "get": {
+                "description": "获取服务详情",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "服务管理"
+                ],
+                "summary": "获取服务详情",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "服务ID",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/middleware.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/dao.ServiceDetail"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
         "/service/service_list": {
             "get": {
                 "description": "获取服务列表",
@@ -376,6 +420,197 @@ var doc = `{
         }
     },
     "definitions": {
+        "dao.AccessControl": {
+            "type": "object",
+            "properties": {
+                "black_list": {
+                    "type": "string"
+                },
+                "clientip_flow_limit": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "open_auth": {
+                    "type": "integer"
+                },
+                "service_flow_limit": {
+                    "type": "integer"
+                },
+                "service_id": {
+                    "type": "integer"
+                },
+                "white_host_name": {
+                    "type": "string"
+                },
+                "white_list": {
+                    "type": "string"
+                }
+            }
+        },
+        "dao.GrpcRule": {
+            "type": "object",
+            "properties": {
+                "header_transfor": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "port": {
+                    "type": "integer"
+                },
+                "service_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dao.HttpRule": {
+            "type": "object",
+            "properties": {
+                "header_transfor": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "need_https": {
+                    "type": "integer"
+                },
+                "need_strip_uri": {
+                    "type": "integer"
+                },
+                "need_websocket": {
+                    "type": "integer"
+                },
+                "rule": {
+                    "type": "string"
+                },
+                "rule_type": {
+                    "type": "integer"
+                },
+                "service_id": {
+                    "type": "integer"
+                },
+                "url_rewrite": {
+                    "type": "string"
+                }
+            }
+        },
+        "dao.LoadBalance": {
+            "type": "object",
+            "properties": {
+                "check_interval": {
+                    "type": "integer"
+                },
+                "check_method": {
+                    "type": "integer"
+                },
+                "check_timeout": {
+                    "type": "integer"
+                },
+                "forbid_list": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "ip_list": {
+                    "type": "string"
+                },
+                "round_type": {
+                    "type": "integer"
+                },
+                "service_id": {
+                    "type": "integer"
+                },
+                "upstream_connect_timeout": {
+                    "type": "integer"
+                },
+                "upstream_header_timeout": {
+                    "type": "integer"
+                },
+                "upstream_idle_timeout": {
+                    "type": "integer"
+                },
+                "upstream_max_idle": {
+                    "type": "integer"
+                },
+                "weight_list": {
+                    "type": "string"
+                }
+            }
+        },
+        "dao.ServiceDetail": {
+            "type": "object",
+            "properties": {
+                "access_control": {
+                    "type": "object",
+                    "$ref": "#/definitions/dao.AccessControl"
+                },
+                "grpc_rule": {
+                    "type": "object",
+                    "$ref": "#/definitions/dao.GrpcRule"
+                },
+                "http_rule": {
+                    "type": "object",
+                    "$ref": "#/definitions/dao.HttpRule"
+                },
+                "info": {
+                    "type": "object",
+                    "$ref": "#/definitions/dao.ServiceInfo"
+                },
+                "load_balance": {
+                    "type": "object",
+                    "$ref": "#/definitions/dao.LoadBalance"
+                },
+                "tcp_rule": {
+                    "type": "object",
+                    "$ref": "#/definitions/dao.TcpRule"
+                }
+            }
+        },
+        "dao.ServiceInfo": {
+            "type": "object",
+            "properties": {
+                "create_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "is_delete": {
+                    "type": "integer"
+                },
+                "load_type": {
+                    "type": "integer"
+                },
+                "service_desc": {
+                    "type": "string"
+                },
+                "service_name": {
+                    "type": "string"
+                },
+                "update_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "dao.TcpRule": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "port": {
+                    "type": "integer"
+                },
+                "service_id": {
+                    "type": "integer"
+                }
+            }
+        },
         "dto.AdminInfoOutput": {
             "type": "object",
             "properties": {
