@@ -18,6 +18,7 @@ func ServiceRegister(group *gin.RouterGroup) {
 	group.GET("/service_list", service.ServiceList)
 	group.GET("/service_delete", service.ServiceDelete)
 	group.POST("/service_add_http", service.ServiceAddHTTP)
+	group.POST("/service_update_http", service.ServiceUpdateHTTP)
 }
 
 type ServiceController struct {
@@ -243,4 +244,95 @@ func (c *ServiceController) ServiceAddHTTP(ctx *gin.Context) {
 
 	gDB.Commit()
 	middleware.ResponseSuccess(ctx, "添加成功")
+}
+
+// @Summary 修改HTTP服务
+// @Description 修改HTTP服务
+// @Tags 服务管理
+// @Accept  json
+// @Produce  json
+// @Param body body dto.ServiceUpdateInput true "body"
+// @Success 200 {object} middleware.Response{data=string} "success"
+// @Router /service/service_update_http [POST]
+func (c *ServiceController) ServiceUpdateHTTP(ctx *gin.Context) {
+	params := &dto.ServiceUpdateInput{}
+	if err := params.BindValidParam(ctx); err != nil {
+		middleware.ResponseError(ctx, 2000, err)
+		return
+	}
+
+	gDB, err := lib.GetGormPool("default")
+	if err != nil {
+		middleware.ResponseError(ctx, 2001, err)
+		return
+	}
+	if len(strings.Split(params.IpList, ",")) != len(strings.Split(params.WeightList, ",")) {
+		middleware.ResponseError(ctx, 2002, errors.New("IP列表与权重列表数量不一致"))
+		return
+	}
+
+	gDB = gDB.Begin()
+	serviceInfo := &dao.ServiceInfo{ServiceName: params.ServiceName}
+	serviceInfo, err = serviceInfo.Find(ctx, gDB, serviceInfo)
+	if err != nil {
+		gDB.Rollback()
+		middleware.ResponseError(ctx, 2003, errors.New("服务未查询到："+err.Error()))
+		return
+	}
+
+	serviceDetail, err := serviceInfo.ServiceDetail(ctx, gDB, serviceInfo)
+	if err != nil {
+		gDB.Rollback()
+		middleware.ResponseError(ctx, 2004, errors.New("服务详情未查询到："+err.Error()))
+		return
+	}
+
+	info := serviceDetail.Info
+	info.ServiceDesc = params.ServiceDesc
+	if err := info.Save(ctx, gDB); err != nil {
+		gDB.Rollback()
+		middleware.ResponseError(ctx, 2005, errors.New("服务描述更新失败："+err.Error()))
+		return
+	}
+
+	httpRule := serviceDetail.HTTPRule
+	httpRule.NeedHttps = params.NeedHttps
+	httpRule.NeedStripUri = params.NeedStripUri
+	httpRule.NeedWebsocket = params.NeedWebsocket
+	httpRule.UrlRewrite = params.UrlRewrite
+	httpRule.HeaderTransfor = params.HeaderTransfor
+	if err := httpRule.Save(ctx, gDB); err != nil {
+		gDB.Rollback()
+		middleware.ResponseError(ctx, 2006, err)
+		return
+	}
+
+	accessControl := serviceDetail.AccessControl
+	accessControl.OpenAuth = params.OpenAuth
+	accessControl.BlackList = params.BlackList
+	accessControl.WhiteList = params.WhiteList
+	accessControl.ClientIPFlowLimit = params.ClientipFlowLimit
+	accessControl.ServiceFlowLimit = params.ServiceFlowLimit
+	if err := accessControl.Save(ctx, gDB); err != nil {
+		gDB.Rollback()
+		middleware.ResponseError(ctx, 2007, err)
+		return
+	}
+
+	loadBalance := serviceDetail.LoadBalance
+	loadBalance.RoundType = params.RoundType
+	loadBalance.IpList = params.IpList
+	loadBalance.WeightList = params.WeightList
+	loadBalance.UpstreamConnectTimeout = params.UpstreamConnectTimeout
+	loadBalance.UpstreamHeaderTimeout = params.UpstreamHeaderTimeout
+	loadBalance.UpstreamIdleTimeout = params.UpstreamIdleTimeout
+	loadBalance.UpstreamMaxIdle = params.UpstreamMaxIdle
+	if err := loadBalance.Save(ctx, gDB); err != nil {
+		gDB.Rollback()
+		middleware.ResponseError(ctx, 2008, err)
+		return
+	}
+
+	gDB.Commit()
+	middleware.ResponseSuccess(ctx, "修改成功")
 }

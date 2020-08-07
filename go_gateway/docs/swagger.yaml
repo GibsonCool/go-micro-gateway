@@ -162,6 +162,92 @@ definitions:
         description: 总数
         type: string
     type: object
+  dto.ServiceUpdateInput:
+    properties:
+      black_list:
+        description: 黑名单ip
+        type: string
+      clientip_flow_limit:
+        description: "\b客户端ip限流"
+        type: integer
+      header_transfor:
+        description: header转换
+        type: string
+      id:
+        description: 服务id
+        example: "62"
+        type: string
+      ip_list:
+        description: ip列表
+        example: 127.0.0.1:7777
+        type: string
+      need_https:
+        description: 支持https
+        example: 1
+        type: integer
+      need_strip_uri:
+        description: 启用strip_uri
+        example: 1
+        type: integer
+      need_websocket:
+        description: 是否支持websocket
+        example: 1
+        type: integer
+      open_auth:
+        description: 关键词
+        type: integer
+      round_type:
+        description: 轮询方式
+        type: integer
+      rule:
+        description: 域名或者前缀
+        example: /new_test_123_fix
+        type: string
+      rule_type:
+        description: 接入类型
+        example: 0
+        type: integer
+      service_desc:
+        description: 服务描述
+        example: test123456_fix
+        type: string
+      service_flow_limit:
+        description: 服务端限流
+        type: integer
+      service_name:
+        description: 服务名
+        example: new_test_123
+        type: string
+      upstream_connect_timeout:
+        description: 建立连接超时, 单位s
+        type: integer
+      upstream_header_timeout:
+        description: 获取header超时, 单位s
+        type: integer
+      upstream_idle_timeout:
+        description: 链接最大空闲时间, 单位s
+        type: integer
+      upstream_max_idle:
+        description: 最大空闲链接数
+        type: integer
+      url_rewrite:
+        description: url重写功能
+        type: string
+      weight_list:
+        description: "\b权重列表"
+        example: "80"
+        type: string
+      white_list:
+        description: 白名单ip
+        type: string
+    required:
+    - id
+    - ip_list
+    - rule
+    - service_desc
+    - service_name
+    - weight_list
+    type: object
   middleware.Response:
     properties:
       data:
@@ -355,6 +441,33 @@ paths:
                   $ref: '#/definitions/dto.ServiceListOutput'
               type: object
       summary: 服务列表
+      tags:
+      - 服务管理
+  /service/service_update_http:
+    post:
+      consumes:
+      - application/json
+      description: 修改HTTP服务
+      parameters:
+      - description: body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ServiceUpdateInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            allOf:
+            - $ref: '#/definitions/middleware.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: 修改HTTP服务
       tags:
       - 服务管理
 swagger: "2.0"
