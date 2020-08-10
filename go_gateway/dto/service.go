@@ -105,3 +105,8 @@ type ServiceUpdateInput struct {
 func (s *ServiceUpdateInput) BindValidParam(ctx *gin.Context) error {
 	return public.DefaultGetValidParams(ctx, s)
 }
+
+type ServiceStatOutput struct {
+	Today     []int64 `json:"today" form:"today" comment:"今日流量" example:"" validate:""`         //今日流量
+	Yesterday []int64 `json:"yesterday" form:"yesterday" comment:"昨日流量" example:"" validate:""` //昨日流量
+}

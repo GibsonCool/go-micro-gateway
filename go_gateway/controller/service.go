@@ -11,6 +11,7 @@ import (
 	"go-micro-gateway/go_gateway/public"
 	"strconv"
 	"strings"
+	"time"
 )
 
 func ServiceRegister(group *gin.RouterGroup) {
@@ -19,6 +20,7 @@ func ServiceRegister(group *gin.RouterGroup) {
 	group.GET("/service_delete", service.ServiceDelete)
 	group.POST("/service_add_http", service.ServiceAddHTTP)
 	group.GET("/service_detail", service.ServiceDetail)
+	group.GET("/service_stat", service.ServiceStat)
 	group.POST("/service_update_http", service.ServiceUpdateHTTP)
 }
 
@@ -375,4 +377,56 @@ func (c *ServiceController) ServiceDetail(ctx *gin.Context) {
 	}
 
 	middleware.ResponseSuccess(ctx, serviceDetail)
+}
+
+// @Summary 服务统计
+// @Description 服务统计
+// @Tags 服务管理
+// @Accept  json
+// @Produce  json
+// @Param id query string true "服务ID"
+// @Success 200 {object} middleware.Response{data=dto.ServiceStatOutput} "success"
+// @Router /service/service_stat [get]
+func (c *ServiceController) ServiceStat(ctx *gin.Context) {
+	params := &dto.ServiceDelete{}
+	if err := params.BindValidParam(ctx); err != nil {
+		middleware.ResponseError(ctx, 2000, err)
+		return
+	}
+
+	gDB, err := lib.GetGormPool("default")
+	if err != nil {
+		middleware.ResponseError(ctx, 2001, err)
+		return
+	}
+
+	serviceInfo := &dao.ServiceInfo{ID: params.ID}
+	serviceInfo, err = serviceInfo.Find(ctx, gDB, serviceInfo)
+	//if err != nil {
+	//	gDB.Rollback()
+	//	middleware.ResponseError(ctx, 2002, errors.New("服务未查询到："+err.Error()))
+	//	return
+	//}
+
+	//serviceDetail, err := serviceInfo.ServiceDetail(ctx, gDB, serviceInfo)
+	//if err != nil {
+	//	gDB.Rollback()
+	//	middleware.ResponseError(ctx, 2003, errors.New("服务详情未查询到："+err.Error()))
+	//	return
+	//}
+
+	var todayList []int64
+	for i := 0; i < time.Now().Hour(); i++ {
+		todayList = append(todayList, 0)
+	}
+
+	var yesTodayList []int64
+	for i := 0; i < 23; i++ {
+		yesTodayList = append(yesTodayList, 0)
+	}
+
+	middleware.ResponseSuccess(ctx, &dto.ServiceStatOutput{
+		Yesterday: yesTodayList,
+		Today:     todayList,
+	})
 }
