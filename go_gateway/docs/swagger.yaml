@@ -18,6 +18,29 @@ definitions:
       white_list:
         type: string
     type: object
+  dao.App:
+    properties:
+      app_id:
+        type: string
+      create_at:
+        type: string
+      id:
+        type: integer
+      is_delete:
+        type: integer
+      name:
+        type: string
+      qpd:
+        type: integer
+      qps:
+        type: integer
+      secret:
+        type: string
+      update_at:
+        type: string
+      white_ips:
+        type: string
+    type: object
   dao.GrpcRule:
     properties:
       header_transfor:
@@ -125,6 +148,81 @@ definitions:
         type: integer
       service_id:
         type: integer
+    type: object
+  dto.APPAddHttpInput:
+    properties:
+      app_id:
+        type: string
+      name:
+        type: string
+      qpd:
+        type: integer
+      qps:
+        type: integer
+      secret:
+        type: string
+      white_ips:
+        type: string
+    required:
+    - app_id
+    - name
+    type: object
+  dto.APPListItemOutput:
+    properties:
+      app_id:
+        type: string
+      create_at:
+        type: string
+      id:
+        type: integer
+      is_delete:
+        type: integer
+      name:
+        type: string
+      qpd:
+        type: integer
+      qps:
+        type: integer
+      real_qpd:
+        type: integer
+      real_qps:
+        type: integer
+      secret:
+        type: string
+      update_at:
+        type: string
+      white_ips:
+        type: string
+    type: object
+  dto.APPListOutput:
+    properties:
+      list:
+        items:
+          $ref: '#/definitions/dto.APPListItemOutput'
+        type: array
+      total:
+        type: integer
+    type: object
+  dto.APPUpdateHttpInput:
+    properties:
+      app_id:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      qpd:
+        type: integer
+      qps:
+        type: integer
+      secret:
+        type: string
+      white_ips:
+        type: string
+    required:
+    - id
+    - name
+    - secret
     type: object
   dto.AdminInfoOutput:
     properties:
@@ -540,6 +638,20 @@ definitions:
     - service_name
     - weight_list
     type: object
+  dto.StatisticsOutput:
+    properties:
+      today:
+        items:
+          type: integer
+        type: array
+      yesterday:
+        items:
+          type: integer
+        type: array
+    required:
+    - today
+    - yesterday
+    type: object
   middleware.Response:
     properties:
       data:
@@ -651,6 +763,171 @@ paths:
       summary: 管理员退出
       tags:
       - 管理员接口
+  /app/app_add:
+    post:
+      consumes:
+      - application/json
+      description: 租户添加
+      parameters:
+      - description: body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.APPAddHttpInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            allOf:
+            - $ref: '#/definitions/middleware.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: 租户添加
+      tags:
+      - 租户管理
+  /app/app_delete:
+    get:
+      consumes:
+      - application/json
+      description: 删除租户详情
+      parameters:
+      - description: 租户ID
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            allOf:
+            - $ref: '#/definitions/middleware.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: 删除租户详情
+      tags:
+      - 租户管理
+  /app/app_detail:
+    get:
+      consumes:
+      - application/json
+      description: 获取租户详情
+      parameters:
+      - description: 租户ID
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            allOf:
+            - $ref: '#/definitions/middleware.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dao.App'
+              type: object
+      summary: 获取租户详情
+      tags:
+      - 租户管理
+  /app/app_list:
+    get:
+      description: 获取租户列表
+      parameters:
+      - description: 关键词
+        in: query
+        name: info
+        type: string
+      - description: 页数
+        in: query
+        name: page_no
+        required: true
+        type: integer
+      - description: 每页个数
+        in: query
+        name: page_size
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            allOf:
+            - $ref: '#/definitions/middleware.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.APPListOutput'
+              type: object
+      summary: 租户列表
+      tags:
+      - 租户管理
+  /app/app_stat:
+    get:
+      consumes:
+      - application/json
+      description: 租户统计
+      parameters:
+      - description: 租户ID
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            allOf:
+            - $ref: '#/definitions/middleware.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.StatisticsOutput'
+              type: object
+      summary: 租户统计
+      tags:
+      - 租户管理
+  /app/app_update:
+    post:
+      consumes:
+      - application/json
+      description: 更新租户详情
+      parameters:
+      - description: body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.APPUpdateHttpInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            allOf:
+            - $ref: '#/definitions/middleware.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: 更新租户详情
+      tags:
+      - 租户管理
   /service/service_add_grpc:
     post:
       consumes:
