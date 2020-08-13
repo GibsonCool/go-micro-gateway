@@ -103,3 +103,18 @@ func (t *ServiceInfo) ServiceDetail(c *gin.Context, db *gorm.DB, search *Service
 	}
 	return detail, nil
 }
+
+func (t *ServiceInfo) GroupByLoadType(
+	c *gin.Context, db *gorm.DB) (list []dto.DashServiceStatItemOutput, err error) {
+
+	query := db.SetCtx(public.GetGinTraceContext(c))
+
+	// 确定查询表以及过滤已逻辑删除的数据
+	if err = query.Table(t.TableName()).
+		Where("is_delete=0").
+		Select("load_type,count(*) as value").Group("load_type").Scan(&list).Error; err != nil {
+		return nil, err
+	}
+
+	return list, nil
+}
